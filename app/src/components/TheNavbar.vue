@@ -1,6 +1,8 @@
 <script>
 export default {
-  props: ['tagline'],
+  props: {
+    tagline: [String, Number],
+  },
   data: () => ({
     navList: [
       {
@@ -24,7 +26,7 @@ export default {
   <nav class="navbar has-shadow">
     <div class="navbar-brand">
       <RouterLink to="/" class="navbar-item">
-        <img src="@/assets/to-eat-logo.svg" alt="" width="100" />
+        <img src="@/assets/to-eat-logo.svg" alt="" width="100"/>
       </RouterLink>
     </div>
     <div class="navbar-menu">

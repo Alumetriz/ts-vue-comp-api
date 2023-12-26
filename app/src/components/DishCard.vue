@@ -1,14 +1,18 @@
-<script>
-export default {
+<script lang="ts">
+import {defineComponent} from "vue";
+import type {PropType} from "vue";
+import type { TheDish } from "@/types";
+
+export default defineComponent({
   props: {
     dish: {
-      type: Object,
+      type: Object as PropType<TheDish>,
       required: true,
     },
   },
   emits: ['delete-dish'],
   computed: {
-    statusColor() {
+    statusColor(): string {
       switch (this.dish.status) {
         case 'Want to Try':
           return 'is-warning'
@@ -22,18 +26,18 @@ export default {
     },
   },
   methods: {
-    deleteDish() {
+    deleteDish(): void {
       this.$emit('delete-dish', this.dish)
     },
   },
-}
+})
 </script>
 
 <template>
   <article class="box">
     <div class="media">
       <aside class="media-left">
-        <img src="https://placehold.jp/150x150.png" alt="" />
+        <img src="https://placehold.jp/150x150.png" alt=""/>
       </aside>
       <div class="media-content">
         <p class="title is-4 is-spaced mb-1">

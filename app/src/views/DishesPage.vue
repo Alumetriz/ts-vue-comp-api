@@ -1,17 +1,21 @@
-<script>
+<script lang="ts">
 import NewDishForm from '../components/NewDishForm.vue'
 import DishCard from '../components/DishCard.vue'
 import SideMenu from '../components/SideMenu.vue'
+import {defineComponent, onMounted, ref} from "vue";
+import type {DishesDataShape, TheDish} from "@/types";
+import {useRoute} from "vue-router";
 
-export default {
+export default defineComponent({
   components: {
     NewDishForm,
     DishCard,
     SideMenu,
   },
-  data: () => ({
-    filterText: '',
-    dishList: [
+
+  setup() {
+    const filterText = ref('')
+    const dishList = ref([
       {
         id: '7d9f3f17-964a-4e82-98e5-ecbba4d709a1',
         name: 'Ghost Pepper Poppers',
@@ -27,51 +31,61 @@ export default {
         name: 'Full Laptop Battery',
         status: 'Do Not Recommend',
       },
-    ],
-    showNewForm: false,
-  }),
-  computed: {
-    filteredDishList() {
-      return this.dishList.filter((dish) => {
+    ])
+    const showNewForm = ref(false)
+
+    const filteredDishList = (): TheDish[] => {
+      return dishList.value.filter((dish) => {
         if (dish.name) {
-          return dish.name.toLowerCase().includes(this.filterText.toLowerCase())
+          return dish.name.toLowerCase().includes(filterText.value.toLowerCase())
         } else {
-          return this.dishList
+          return dishList.value
         }
       })
-    },
-    numberOfDishes() {
-      return this.filteredDishList.length
-    },
-  },
-  methods: {
-    addDish(payload) {
-      this.dishList.push(payload)
-      this.hideForm()
-    },
-    deleteDish(payload) {
-      this.dishList = this.dishList.filter((dish) => {
+    }
+    const numberOfDishes = (): number => {
+      return filteredDishList.length
+    }
+
+    const addDish = (payload: TheDish): void => {
+      dishList.value.push(payload)
+      hideForm()
+    }
+    const deleteDish = (payload: TheDish): void => {
+      dishList.value = dishList.value.filter((dish) => {
         return dish.id !== payload.id
       })
-    },
-    hideForm() {
-      this.showNewForm = false
-    },
-  },
-  mounted() {
-    const route = this.$route
-    if (route.query.new) {
-      this.showNewForm = true
+    }
+    const hideForm = (): void => {
+      showNewForm.value = false
+    }
+
+    onMounted(() => {
+      const route = useRoute()
+      if (route.query.new) {
+        showNewForm.value = true
+      }
+    })
+
+    return {
+      filterText,
+      dishList,
+      showNewForm,
+      filteredDishList,
+      numberOfDishes,
+      addDish,
+      deleteDish,
+      hideForm,
     }
   },
-}
+})
 </script>
 
 <template>
   <main class="section">
     <div class="columns">
       <!-- Side Menu -->
-      <SideMenu />
+      <SideMenu/>
 
       <!-- Main Content -->
       <div class="column">
@@ -93,7 +107,7 @@ export default {
             <div class="level-item is-hidden-tablet-only">
               <div class="field has-addons">
                 <p class="control">
-                  <input class="input" type="text" placeholder="Dish name" v-model="filterText" />
+                  <input class="input" type="text" placeholder="Dish name" v-model="filterText"/>
                 </p>
                 <p class="control">
                   <button class="button">Search</button>
@@ -104,12 +118,12 @@ export default {
         </nav>
 
         <!-- New Dish Form -->
-        <NewDishForm v-if="showNewForm" @add-new-dish="addDish" @cancel-new-dish="hideForm" />
+        <NewDishForm v-if="showNewForm" @add-new-dish="addDish" @cancel-new-dish="hideForm"/>
 
         <!-- Display Results -->
         <div v-else class="columns is-multiline">
           <div v-for="item in filteredDishList" class="column is-full" :key="`item-${item}`">
-            <DishCard :dish="item" @delete-dish="deleteDish" />
+            <DishCard :dish="item" @delete-dish="deleteDish"/>
           </div>
         </div>
       </div>
