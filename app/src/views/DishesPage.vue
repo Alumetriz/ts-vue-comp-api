@@ -5,49 +5,34 @@ import SideMenu from '../components/SideMenu.vue'
 import {computed, onMounted, ref} from "vue";
 import type {TheDish} from "@/types";
 import {useRoute} from "vue-router";
+import {useDishesStore} from "@/store/DishesStore";
 
 const filterText = ref('')
-const dishList = ref<TheDish[]>([
-  {
-    id: '7d9f3f17-964a-4e82-98e5-ecbba4d709a1',
-    name: 'Ghost Pepper Poppers',
-    status: 'Want to Try',
-  },
-  {
-    id: '5c986b74-fa02-4a22-98f2-b1ff3559e85e',
-    name: 'A Little More Chowder Now',
-    status: 'Recommended',
-  },
-  {
-    id: 'c113411d-1589-414f-a283-daf7eedb631e',
-    name: 'Full Laptop Battery',
-    status: 'Do Not Recommend',
-  },
-])
-const showNewForm = ref(false)
+const dishesStore = useDishesStore();
+const showNewForm = ref(false);
 
-const filteredDishList = (): TheDish[] => {
-  return dishList.value.filter((dish) => {
+const filteredDishList = computed((): TheDish[] => {
+  return dishesStore.list.filter((dish) => {
     if (dish.name) {
       return dish.name.toLowerCase().includes(filterText.value.toLowerCase())
     } else {
-      return dishList.value
+      return dishesStore.list
     }
   })
-}
+});
+
 const numberOfDishes = computed((): number => {
-  return filteredDishList.length
-})
+  return dishesStore.numberOfDishes
+});
 
 const addDish = (payload: TheDish): void => {
-  dishList.value.push(payload)
-  hideForm()
+  dishesStore.addDish(payload);
+  hideForm();
 }
 const deleteDish = (payload: TheDish): void => {
-  dishList.value = dishList.value.filter((dish) => {
-    return dish.id !== payload.id
-  })
+  dishesStore.deleteDish(payload);
 }
+
 const hideForm = (): void => {
   showNewForm.value = false
 }
@@ -58,6 +43,10 @@ onMounted(() => {
     showNewForm.value = true
   }
 })
+
+const filterDishes = (event: InputEvent) => {
+  filterText.value = (event.target as HTMLInputElement)?.value;
+}
 </script>
 
 <template>
@@ -86,7 +75,7 @@ onMounted(() => {
             <div class="level-item is-hidden-tablet-only">
               <div class="field has-addons">
                 <p class="control">
-                  <input class="input" type="text" placeholder="Dish name" v-model="filterText"/>
+                  <input class="input" type="text" placeholder="Dish name" :value="filterText" @input="filterDishes"/>
                 </p>
                 <p class="control">
                   <button class="button">Search</button>

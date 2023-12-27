@@ -5,58 +5,37 @@ import NewRestaurantForm from '../components/NewRestaurantForm.vue'
 import RestaurantCard from '../components/RestaurantCard.vue'
 import SideMenu from '../components/SideMenu.vue'
 import type {Restaurant} from "@/types";
+import {useRestaurantStore} from "@/store/RestaurantStore";
 
 const filterText = ref('');
 
-const restaurantList = ref<Restaurant[]>([
-  {
-    id: '9f995ce4-d2fc-4d00-af1d-6cb1647c6bd3',
-    name: 'Quiche From a Rose',
-    address: '283 Thisisnota St.',
-    website: 'www.quichefromarose.com',
-    status: 'Want to Try',
-  },
-  {
-    id: 'ae62a3da-791b-4f44-99a1-4be1b0ec30b8',
-    name: 'Tamago Never Dies',
-    address: '529 Letsgofora Dr.',
-    website: 'www.tamagoneverdies.com',
-    status: 'Recommended',
-  },
-  {
-    id: '9b361dae-2d44-4499-9940-97e188d41a32',
-    name: 'Penne For Your Thoughts',
-    address: '870 Thisisa St.',
-    website: 'www.penneforyourthoughts.com',
-    status: 'Do Not Recommend',
-  },
-]);
+const restaurantStore = useRestaurantStore();
 
 const showNewForm = ref(false);
 
+
 const filteredRestaurantList = computed((): Restaurant[] => {
-  return restaurantList.value.filter((restaurant) => {
+  return restaurantStore.list.filter((restaurant) => {
     if (restaurant.name) {
       return restaurant.name.toLowerCase().includes(filterText.value.toLowerCase())
     } else {
-      return restaurantList.value
+      return restaurantStore.list
     }
   })
 });
 
 const numberOfRestaurants = computed((): number => {
-  return filteredRestaurantList.value.length;
+  return restaurantStore.numberOfRestaurants;
 });
 
+
 const addRestaurant = (payload: Restaurant): void => {
-  restaurantList.value.push(payload)
+  restaurantStore.addRestaurant(payload);
   hideForm()
 }
 
 const deleteRestaurant = (payload: Restaurant): void => {
-  restaurantList.value = restaurantList.value.filter((restaurant) => {
-    return restaurant.id !== payload.id
-  })
+  restaurantStore.deleteRestaurant(payload);
 }
 
 const hideForm = (): void => {
@@ -70,6 +49,10 @@ onMounted(() => {
     showNewForm.value = true;
   }
 })
+
+const filterRestaurants = (event: InputEvent) => {
+  filterText.value = (event.target as HTMLInputElement).value;
+}
 </script>
 
 <template>
@@ -98,7 +81,8 @@ onMounted(() => {
             <div class="level-item is-hidden-tablet-only">
               <div class="field has-addons">
                 <p class="control">
-                  <input class="input" type="text" placeholder="Restaurant name" v-model="filterText"/>
+                  <input class="input" type="text" placeholder="Restaurant name" :value="filterText"
+                         @input="filterRestaurants"/>
                 </p>
                 <p class="control">
                   <button class="button">Search</button>

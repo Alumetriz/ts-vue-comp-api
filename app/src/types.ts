@@ -29,6 +29,6 @@ export interface DishesDataShape extends DataShape {
     dishList: TheDish[]
 }
 
-type Status = 'Want to Try' | 'Recommended' | 'Do Not Recommend';
+export type Status = 'Want to Try' | 'Recommended' | 'Do Not Recommend';
 type Diet = typeof dietList[number]
 type StatusList = typeof restaurantStatusList[number]
