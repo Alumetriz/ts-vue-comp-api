@@ -1,18 +1,33 @@
-<script>
-import { defineComponent, ref } from 'vue'
-import { v4 as uuidv4 } from 'uuid'
+<script setup lang="ts">
+import {v4 as uuidv4} from 'uuid'
+import {onMounted, reactive, ref} from "vue";
+import type {TheDish} from "@/types";
 
-export default defineComponent({
-  emits: ['add-new-dish', 'cancel-new-dish'],
-  data: () => ({
-    newDish: {
-      id: uuidv4(),
-      name: '',
-      status: 'Want to Try',
-      diet: '',
-    },
-  }),
+const newDish = reactive<TheDish>({
+  id: uuidv4(),
+  name: '',
+  status: 'Want to Try',
+  diet: '',
 })
+
+const emit = defineEmits<{
+  (e: 'add-new-dish', newDish: TheDish): void;
+  (e: 'cancel-new-dish'): void;
+}>()
+
+const addNewDish = (): void => {
+  emit('add-new-dish', newDish);
+}
+
+const cancelNewDish = (): void => {
+  emit('cancel-new-dish');
+}
+
+const elNameInput = ref<HTMLInputElement | null>(null);
+
+onMounted(() => {
+  elNameInput.value?.focus();
+});
 </script>
 
 <template>
@@ -22,19 +37,19 @@ export default defineComponent({
         <label for="name" class="label">Name</label>
         <div class="control">
           <input
-            v-model="newDish.name"
-            type="text"
-            class="input is-large"
-            placeholder="Mystery Flavored Shrimp"
-            required
-            ref="elNameInput"
+              v-model="newDish.name"
+              type="text"
+              class="input is-large"
+              placeholder="Mystery Flavored Shrimp"
+              required
+              ref="elNameInput"
           />
         </div>
       </div>
       <div class="field">
         <div class="buttons">
-          <button @click="$emit('add-new-dish', newDish)" class="button is-success">Create</button>
-          <button @click="$emit('cancel-new-dish')" class="button is-light">Cancel</button>
+          <button @click="addNewDish" class="button is-success">Create</button>
+          <button @click="cancelNewDish" class="button is-light">Cancel</button>
         </div>
       </div>
     </div>

@@ -1,18 +1,35 @@
-<script>
-import { v4 as uuidv4 } from 'uuid'
+<script setup lang="ts">
+import {v4 as uuidv4} from 'uuid'
+import {onMounted, reactive, ref} from 'vue'
+import type {Restaurant} from "@/types";
+import {restaurantStatusList} from "@/constants";
 
-export default {
-  emits: ['add-new-restaurant', 'cancel-new-restaurant'],
-  data: () => ({
-    newRestaurant: {
-      id: uuidv4(),
-      name: '',
-      address: '',
-      website: '',
-      status: 'Want to Try',
-    },
-  }),
+const newRestaurant = reactive<Restaurant>({
+  id: uuidv4(),
+  name: '',
+  address: '',
+  website: '',
+  status: 'Want to Try',
+})
+
+const emit = defineEmits<{
+  (e: 'add-new-restaurant', newRestaurant: Restaurant): void;
+  (e: 'cancel-new-restaurant'): void;
+}>()
+
+const addNewRestaurant = (): void => {
+  emit('add-new-restaurant', newRestaurant);
 }
+
+const cancelNewRestaurant = (): void => {
+  emit('cancel-new-restaurant');
+}
+
+const elNameInput = ref<HTMLInputElement | null>(null);
+
+onMounted(() => {
+  elNameInput.value?.focus();
+})
 </script>
 
 <template>
@@ -22,20 +39,20 @@ export default {
         <label for="name" class="label">Name</label>
         <div class="control">
           <input
-            :value="newRestaurant.name"
-            @keyup.space="updateName"
-            type="text"
-            class="input is-large"
-            placeholder="Beignet and the Jets"
-            required
-            ref="elNameInput"
+              :value="newRestaurant.name"
+              @keyup.space="updateName"
+              type="text"
+              class="input is-large"
+              placeholder="Beignet and the Jets"
+              required
+              ref="elNameInput"
           />
         </div>
       </div>
       <div class="field">
         <label for="website" class="label">Website</label>
         <div class="control">
-          <input v-model="newRestaurant.website" type="text" class="input" placeholder="www.beignetandthejets.com" />
+          <input v-model="newRestaurant.website" type="text" class="input" placeholder="www.beignetandthejets.com"/>
         </div>
       </div>
       <div class="field mb-5">
@@ -50,8 +67,8 @@ export default {
       </div>
       <div class="field">
         <div class="buttons">
-          <button @click="$emit('add-new-restaurant', newRestaurant)" class="button is-success">Create</button>
-          <button @click="$emit('cancel-new-restaurant')" class="button is-light">Cancel</button>
+          <button @click="addNewRestaurant" class="button is-success">Create</button>
+          <button @click="cancelNewRestaurant" class="button is-light">Cancel</button>
         </div>
       </div>
     </div>
