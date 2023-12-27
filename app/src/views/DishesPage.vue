@@ -2,12 +2,12 @@
 import NewDishForm from '../components/NewDishForm.vue'
 import DishCard from '../components/DishCard.vue'
 import SideMenu from '../components/SideMenu.vue'
-import {defineComponent, onMounted, ref} from "vue";
-import type {DishesDataShape, TheDish} from "@/types";
+import {computed, onMounted, ref} from "vue";
+import type {TheDish} from "@/types";
 import {useRoute} from "vue-router";
 
 const filterText = ref('')
-const dishList = ref([
+const dishList = ref<TheDish[]>([
   {
     id: '7d9f3f17-964a-4e82-98e5-ecbba4d709a1',
     name: 'Ghost Pepper Poppers',
@@ -35,9 +35,9 @@ const filteredDishList = (): TheDish[] => {
     }
   })
 }
-const numberOfDishes = (): number => {
+const numberOfDishes = computed((): number => {
   return filteredDishList.length
-}
+})
 
 const addDish = (payload: TheDish): void => {
   dishList.value.push(payload)
